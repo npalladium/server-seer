@@ -19,6 +19,22 @@ listening for those API calls.
 
 Also, a shell UI is being worked on, based on [gizak/termui](https://github.com/gizak/termui).
 
+## Using
+
+### Install
+
+To use the application, you will need to build it. To build it you just need
+to [install Go](https://golang.org/doc/install). Once you have Go, just run 
+````go build cmd/main.go````, set up your configuration file and you're good to go.
+
+Once you have one build, you can use the same file on all machines with the same
+architecture.
+
+### Logging
+
+While the application is designed to handle multiple ways to log, currently it only logs
+to screen, so feel free to stream it to a file yourself until file logging is
+implemented.
 
 ## Configuration
 
