@@ -1,0 +1,20 @@
+{
+    "commandsFile": "commands.json",
+    "databaseFile": "../storage.db",
+    "handlers": [{
+        "name": "Load 5min",
+        "identifier": "load_5min",
+        "command": "system_load",
+        "frequency": 10,
+        "placeholders": [{
+            "name": "timeframe",
+            "value": "2"
+        }]
+    }],
+    "sendData": true,
+    "senderSettings": {
+        "url": "http://www.mocky.io/v2/5185415ba171ea3a00704eed",
+        "entriesPerCycle":10,
+        "cycleFrequency":30
+    }
+}
