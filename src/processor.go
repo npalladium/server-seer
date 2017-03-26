@@ -12,7 +12,6 @@ type Processor struct {
 	Command      Command
 	Handler      Handler
 	FinalCommand string
-	Outputs      []ProcessorOutput
 }
 
 type ProcessorOutput struct {
@@ -38,13 +37,6 @@ func (self Processor) Run(channel chan storage.OutputEntry) {
 	ticker := time.NewTicker(frequencyDuration)
 	for {
 		output := self.RunOnce()
-		// self.Outputs = append(
-		// 	self.Outputs,
-		// 	ProcessorOutput{
-		// 		Output:    output,
-		// 		Timestamp: int32(time.Now().Unix()),
-		// 	},
-		// )
 
 		// Notify channel with a new entry
 		channel <- storage.OutputEntry{
