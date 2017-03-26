@@ -1,9 +1,7 @@
 package storage
 
 import (
-	"../../src"
 	"database/sql"
-	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -11,18 +9,13 @@ var (
 	DBConn *sql.DB
 )
 
-func OpenDatabase(dbName string) {
+func OpenDatabase(dbName string) error {
 	var err error
 	DBConn, err = sql.Open("sqlite3", dbName)
-	if err != nil {
-		// Command not found for the handler, error and exit
-		src.ExitApplicationWithMessage(
-			fmt.Sprintf("Issue with db: %s", err),
-		)
-	}
+	return err
 }
 
-func CreateStructure() {
+func CreateStructure() error {
 	_, err := DBConn.Exec(`
         CREATE TABLE IF NOT EXISTS 'entries' (
             'id' INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,17 +29,19 @@ func CreateStructure() {
     `)
 
 	if err != nil {
-		src.ExitApplicationWithMessage(
-			fmt.Sprintf("Error creating the table: %s", err),
-		)
+		return err
 	}
 	_, err = DBConn.Exec(`
         CREATE INDEX IF NOT EXISTS is_sent_idx ON entries (is_sent);
     `)
 
 	if err != nil {
-		src.ExitApplicationWithMessage(
-			fmt.Sprintf("Error adding index: %s", err),
-		)
+		return err
 	}
+
+	_, err = DBConn.Exec(`
+        CREATE INDEX IF NOT EXISTS handler_identifier_idx ON entries (handler_identifier);
+    `)
+
+	return err
 }

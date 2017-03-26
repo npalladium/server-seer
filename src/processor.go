@@ -2,6 +2,7 @@ package src
 
 import (
 	"../src/logger"
+	"../src/storage"
 	"fmt"
 	"strings"
 	"time"
@@ -32,21 +33,26 @@ func (self *Processor) GenerateFinalCommand() {
 
 }
 
-func (self *Processor) Run(channel chan *Processor) {
+func (self Processor) Run(channel chan storage.OutputEntry) {
 	frequencyDuration := time.Second * time.Duration(self.Handler.Frequency)
 	ticker := time.NewTicker(frequencyDuration)
 	for {
 		output := self.RunOnce()
-		self.Outputs = append(
-			self.Outputs,
-			ProcessorOutput{
-				Output:    output,
-				Timestamp: int32(time.Now().Unix()),
-			},
-		)
+		// self.Outputs = append(
+		// 	self.Outputs,
+		// 	ProcessorOutput{
+		// 		Output:    output,
+		// 		Timestamp: int32(time.Now().Unix()),
+		// 	},
+		// )
 
-		// Notify channel to save entry from this processor
-		channel <- self
+		// Notify channel with a new entry
+		channel <- storage.OutputEntry{
+			HandlerIdentifier: self.Handler.Identifier,
+			CommandName:       self.Command.Name,
+			Output:            output,
+			Timestamp:         int32(time.Now().Unix()),
+		}
 
 		// time.Sleep(time.Second * time.Duration(self.Handler.GetCheckFrequency()))
 		<-ticker.C
@@ -57,7 +63,7 @@ func (self Processor) RunOnce() string {
 
 	logger.Logger.Log(
 		fmt.Sprintf(
-			"[%s] Running '%s'\n",
+			"[%s] Running '%s'",
 			time.Now().Format(time.RFC3339),
 			self.Handler.Name,
 		),
@@ -67,7 +73,7 @@ func (self Processor) RunOnce() string {
 
 	logger.Logger.Log(
 		fmt.Sprintf(
-			"[%s] Finished running '%s'. Output: '%s'\n",
+			"[%s] Finished running '%s'. Output: '%s'",
 			time.Now().Format(time.RFC3339),
 			self.Handler.Name,
 			output,

@@ -60,8 +60,21 @@ func InitializeLogger(configuration src.Configuration) {
 //
 // Creates the structure from scratch, if not defined already.
 func SetupDatabase(configuration src.Configuration) {
-	storage.OpenDatabase(configuration.DatabaseFile)
+	err := storage.OpenDatabase(configuration.DatabaseFile)
+
+	if err != nil {
+		src.ExitApplicationWithMessage(
+			fmt.Sprintf("Error opening database: %s", err),
+		)
+	}
+
 	storage.CreateStructure()
+
+	if err != nil {
+		src.ExitApplicationWithMessage(
+			fmt.Sprintf("Error creating structure: %s", err),
+		)
+	}
 }
 
 // Parses the commands from a JSON file and does basic validation

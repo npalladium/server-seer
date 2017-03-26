@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"../../src"
 	"../../src/logger"
 	"fmt"
 	"time"
@@ -15,16 +14,14 @@ type OutputEntry struct {
 	Timestamp         int32  `json:'timestamp'`
 }
 
-func GetUnsentEntries(maxEntries int) []OutputEntry {
+func GetUnsentEntries(maxEntries int) ([]OutputEntry, error) {
 
 	rows, err := DBConn.Query(
 		"SELECT id, handler_identifier, output, timestamp FROM entries WHERE is_sent = 0 LIMIT ?",
 		maxEntries,
 	)
 	if err != nil {
-		src.ExitApplicationWithMessage(
-			fmt.Sprintf("Error parsing entries: %s", err),
-		)
+		return nil, err
 	}
 
 	var entries []OutputEntry
@@ -32,24 +29,19 @@ func GetUnsentEntries(maxEntries int) []OutputEntry {
 	for rows.Next() {
 		var entry OutputEntry
 		err = rows.Scan(&entry.Id, &entry.HandlerIdentifier, &entry.Output, &entry.Timestamp)
-		if err != nil {
-			src.ExitApplicationWithMessage(
-				fmt.Sprintf("Error parsing entries: %s", err),
-			)
-		}
+
+		return nil, err
 
 		entries = append(entries, entry)
 	}
 
-	// fmt.Println(entries)
-
-	return entries
+	return entries, nil
 
 }
 
-func StoreOutputEntries(entries []OutputEntry) {
+func StoreOutputEntries(entries []OutputEntry) error {
 	if len(entries) == 0 {
-		return
+		return nil
 	}
 
 	msStart := time.Now().UnixNano() / int64(time.Millisecond)
@@ -57,9 +49,7 @@ func StoreOutputEntries(entries []OutputEntry) {
 	tx, err := DBConn.Begin()
 
 	if err != nil {
-		src.ExitApplicationWithMessage(
-			fmt.Sprintf("Error starting transaction: %s", err),
-		)
+		return err
 	}
 
 	stmt, err := tx.Prepare(`
@@ -69,9 +59,7 @@ func StoreOutputEntries(entries []OutputEntry) {
 	`)
 
 	if err != nil {
-		src.ExitApplicationWithMessage(
-			fmt.Sprintf("Error preparing statement: %s", err),
-		)
+		return err
 	}
 
 	for _, entry := range entries {
@@ -83,9 +71,7 @@ func StoreOutputEntries(entries []OutputEntry) {
 		)
 
 		if err != nil {
-			src.ExitApplicationWithMessage(
-				fmt.Sprintf("Error inserting entry: %s", err),
-			)
+			return err
 		}
 	}
 
@@ -102,9 +88,11 @@ func StoreOutputEntries(entries []OutputEntry) {
 		),
 	)
 
+	return nil
+
 }
 
-func (self OutputEntry) Store() bool {
+func (self OutputEntry) Store() error {
 
 	stmt, err := DBConn.Prepare(`
     	INSERT INTO entries
@@ -113,9 +101,7 @@ func (self OutputEntry) Store() bool {
 	`)
 
 	if err != nil {
-		src.ExitApplicationWithMessage(
-			fmt.Sprintf("Error creating entry insert statement: %s", err),
-		)
+		return err
 	}
 
 	_, err = stmt.Exec(
@@ -126,10 +112,8 @@ func (self OutputEntry) Store() bool {
 	)
 
 	if err != nil {
-		src.ExitApplicationWithMessage(
-			fmt.Sprintf("Error inserting entry: %s", err),
-		)
+		return err
 	}
 
-	return true
+	return nil
 }

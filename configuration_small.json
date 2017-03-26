@@ -2,19 +2,34 @@
     "commandsFile": "commands.json",
     "databaseFile": "../storage.db",
     "handlers": [{
-        "name": "Load 5min",
-        "identifier": "load_5min",
+        "name": "RAM remaining",
+        "identifier": "memory_remaining",
+        "command": "memory_usage_remaining",
+        "frequency": 30,
+        "placeholders": []
+    }, {
+        "name": "Load 1min",
+        "identifier": "load_1min",
         "command": "system_load",
         "frequency": 10,
         "placeholders": [{
             "name": "timeframe",
-            "value": "2"
+            "value": "1"
+        }]
+    }, {
+        "name": "Load 15min",
+        "identifier": "load_15min",
+        "command": "system_load",
+        "frequency": 30,
+        "placeholders": [{
+            "name": "timeframe",
+            "value": "3"
         }]
     }],
-    "sendData": true,
+    "sendData": false,
     "senderSettings": {
         "url": "http://www.mocky.io/v2/5185415ba171ea3a00704eed",
-        "entriesPerCycle":10,
-        "cycleFrequency":30
+        "entriesPerCycle": 10,
+        "cycleFrequency": 30
     }
 }

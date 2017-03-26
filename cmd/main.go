@@ -7,6 +7,7 @@ import (
 	"../src/startup"
 	"../src/storage"
 	// "sync"
+	"fmt"
 	"runtime"
 	"time"
 )
@@ -56,10 +57,10 @@ func main() {
 	 */
 	logger.Logger.Log(". Running")
 
-	channelOutputedProcessor := make(chan *src.Processor)
-	startProcessors(configuration, channelOutputedProcessor)
+	outputEntryChannel := make(chan storage.OutputEntry)
+	startProcessors(configuration, outputEntryChannel)
 
-	startStorageListener(channelOutputedProcessor)
+	startStorageListener(outputEntryChannel)
 
 	startEntrySender(configuration)
 
@@ -71,35 +72,43 @@ func main() {
 // Start running the processors.
 //
 // This will create a separate goroutine for each processor.
-func startProcessors(configuration src.Configuration, channelOutputedProcessor chan *src.Processor) {
+func startProcessors(configuration src.Configuration, outputEntryChannel chan storage.OutputEntry) {
 
 	// Loop and run all the processors
 	for _, processor := range configuration.RuntimeData.Processors {
 		// Add some time between starting to make log reading easier
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Second * 5)
 
 		// Run processor in a new goroutine
 		logger.Logger.Log(".. Running " + processor.Handler.Name)
-		go processor.Run(channelOutputedProcessor)
+		go processor.Run(outputEntryChannel)
 	}
 }
 
 // Start the storage listener - will listen to channel messages and store
 // data to the database.
-func startStorageListener(channelOutputedProcessor chan *src.Processor) {
-	go func(channelOutputedProcessor chan *src.Processor) {
+func startStorageListener(outputEntryChannel chan storage.OutputEntry) {
+	go func(outputEntryChannel chan storage.OutputEntry) {
+		var err error
+		var outputEntries []storage.OutputEntry
+		storeAmount := 10
 		for {
-			processor := <-channelOutputedProcessor
+			outputEntry := <-outputEntryChannel
+			outputEntries = append(outputEntries, outputEntry)
+			if len(outputEntries) == storeAmount {
+				err = storage.StoreOutputEntries(outputEntries)
 
-			// Create the output entries and store them in the local sqlite database
-			outputEntries := processProcessorToOutputEntry(processor)
+				if err != nil {
+					src.ExitApplicationWithMessage(
+						fmt.Sprintf("Error storing entries: %s", err),
+					)
+				}
 
-			storage.StoreOutputEntries(outputEntries)
+				outputEntries = outputEntries[0:0]
 
-			// outputEntry.Store()
-
+			}
 		}
-	}(channelOutputedProcessor)
+	}(outputEntryChannel)
 }
 
 // Starts the entry sender - send all flagged entries to a remote API.
@@ -121,50 +130,20 @@ func startEntrySender(configuration src.Configuration) {
 		)
 		for {
 			// Parses unsent entries
-			entries := storage.GetUnsentEntries(configuration.SenderSettings.EntriesPerCycle)
+			entries, err := storage.GetUnsentEntries(configuration.SenderSettings.EntriesPerCycle)
+
+			if err != nil {
+				src.ExitApplicationWithMessage(
+					fmt.Sprintf("Error getting unsent entries: %s", err),
+				)
+			}
 
 			if len(entries) != 0 {
 				dataSender.SendEntries(entries)
-
 			}
 
 			// time.Sleep(time.Duration(cycleFrequency) * time.Second)
 			<-ticker.C
 		}
 	}(configuration, dataSender)
-}
-
-// Processes all piled up output entries from a single processor to be saved
-//
-// TODO: Move this somewhere else
-func processProcessorToOutputEntry(processor *src.Processor) []storage.OutputEntry {
-	numOfProcessorOutputs := len(processor.Outputs)
-
-	var outputEntries []storage.OutputEntry
-
-	if numOfProcessorOutputs == 0 {
-		return outputEntries
-	}
-
-	i := 0
-	for i < numOfProcessorOutputs {
-		outputEntries = append(
-			outputEntries,
-			storage.OutputEntry{
-				HandlerIdentifier: processor.Handler.Identifier,
-				CommandName:       processor.Command.Name,
-				Output:            processor.Outputs[i].Output,
-				Timestamp:         processor.Outputs[i].Timestamp,
-			},
-		)
-		i = i + 1
-	}
-	// If the array has not changed, empty slice. Otherwise, slice off the entries processed
-	if len(processor.Outputs) == numOfProcessorOutputs {
-		processor.Outputs = processor.Outputs[0:0]
-	} else {
-		processor.Outputs = processor.Outputs[numOfProcessorOutputs-1:]
-	}
-
-	return outputEntries
 }
