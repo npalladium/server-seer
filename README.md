@@ -17,7 +17,10 @@ Currently, there is no functionality to send that data. A sender is being
 prepared and will work once I have the possibility to work on the server,
 listening for those API calls.
 
-Also, a shell UI is being worked on, based on [gizak/termui](https://github.com/gizak/termui).
+~~Also, a shell UI is being worked on, based on [gizak/termui](https://github.com/gizak/termui).~~
+Scrapped for now because of lacking functionality.
+
+A simple local WEB server for viewing the metrics is being worked on.
 
 ## Using
 
