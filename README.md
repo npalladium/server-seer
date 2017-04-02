@@ -20,7 +20,8 @@ listening for those API calls.
 ~~Also, a shell UI is being worked on, based on [gizak/termui](https://github.com/gizak/termui).~~
 Scrapped for now because of lacking functionality.
 
-A simple local WEB server for viewing the metrics is being worked on.
+For viewing the data locally, [Server Seer Viewer](https://github.com/andriussev/server-seer-viewer)
+should suffice the basic needs.
 
 ## Using
 
