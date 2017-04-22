@@ -121,6 +121,7 @@ func startEntrySender(configuration src.Configuration) {
 
 	dataSender := sender.Sender{
 		ApiUrl: configuration.SenderSettings.Url,
+		ApiKey: configuration.SenderSettings.ApiKey,
 	}
 
 	go func(configuration src.Configuration, dataSender sender.Sender) {
@@ -137,6 +138,8 @@ func startEntrySender(configuration src.Configuration) {
 					fmt.Sprintf("Error getting unsent entries: %s", err),
 				)
 			}
+
+			logger.Logger.Log(fmt.Sprintf("Sending entries. Count: %d", len(entries)))
 
 			if len(entries) != 0 {
 				dataSender.SendEntries(entries)

@@ -30,7 +30,9 @@ func GetUnsentEntries(maxEntries int) ([]OutputEntry, error) {
 		var entry OutputEntry
 		err = rows.Scan(&entry.Id, &entry.HandlerIdentifier, &entry.Output, &entry.Timestamp)
 
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 
 		entries = append(entries, entry)
 	}

@@ -11,12 +11,23 @@ import (
 )
 
 type Sender struct {
+	ApiKey string
 	ApiUrl string
 }
 
+type SendEntries struct {
+	ApiKey  string
+	Entries []storage.OutputEntry
+}
+
 func (self Sender) SendEntries(entries []storage.OutputEntry) {
-	entriesJSON, _ := json.Marshal(entries)
-	req, err := http.NewRequest("POST", self.ApiUrl, bytes.NewBuffer(entriesJSON))
+	sendEntriesData := SendEntries{
+		ApiKey:  self.ApiKey,
+		Entries: entries,
+	}
+	// entriesJSON, _ := json.Marshal(entries)
+	sendEntriesDataJSON, _ := json.Marshal(sendEntriesData)
+	req, err := http.NewRequest("POST", self.ApiUrl, bytes.NewBuffer(sendEntriesDataJSON))
 	if err != nil {
 		logger.Logger.Log(
 			fmt.Sprintf("Error while sending request", err),
@@ -32,6 +43,7 @@ func (self Sender) SendEntries(entries []storage.OutputEntry) {
 	}
 	defer resp.Body.Close()
 
+	fmt.Println("request Body:", sendEntriesData)
 	fmt.Println("response Status:", resp.Status)
 	fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
