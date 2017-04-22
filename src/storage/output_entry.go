@@ -3,6 +3,7 @@ package storage
 import (
 	"../../src/logger"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -39,6 +40,23 @@ func GetUnsentEntries(maxEntries int) ([]OutputEntry, error) {
 
 	return entries, nil
 
+}
+
+func MarkEntriesSent(entries []OutputEntry) {
+	var ids []int
+	for _, entry := range entries {
+		ids = append(ids, entry.Id)
+	}
+
+	str := fmt.Sprintf("UPDATE entries SET is_sent = 1 WHERE id IN (%s)", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(ids)), ","), "[]"))
+
+	_, err := DBConn.Exec(
+		str,
+	)
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 func StoreOutputEntries(entries []OutputEntry) error {

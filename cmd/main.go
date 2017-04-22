@@ -120,8 +120,9 @@ func startEntrySender(configuration src.Configuration) {
 	logger.Logger.Log(". Starting entry sender")
 
 	dataSender := sender.Sender{
-		ApiUrl: configuration.SenderSettings.Url,
-		ApiKey: configuration.SenderSettings.ApiKey,
+		ApiUrl:         configuration.SenderSettings.Url,
+		ApplicationKey: configuration.SenderSettings.ApplicationKey,
+		ServerHandler:  configuration.SenderSettings.ServerHandler,
 	}
 
 	go func(configuration src.Configuration, dataSender sender.Sender) {
@@ -141,8 +142,14 @@ func startEntrySender(configuration src.Configuration) {
 
 			logger.Logger.Log(fmt.Sprintf("Sending entries. Count: %d", len(entries)))
 
+			result := false
+
 			if len(entries) != 0 {
-				dataSender.SendEntries(entries)
+				result = dataSender.SendEntries(entries)
+			}
+
+			if result {
+				storage.MarkEntriesSent(entries)
 			}
 
 			// time.Sleep(time.Duration(cycleFrequency) * time.Second)

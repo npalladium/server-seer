@@ -12,7 +12,8 @@ type Configuration struct {
 
 type SenderSettings struct {
 	Url             string
-	ApiKey          string
+	ApplicationKey  string
+	ServerHandler   string
 	EntriesPerCycle int
 	CycleFrequency  int
 }

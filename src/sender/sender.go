@@ -11,19 +11,26 @@ import (
 )
 
 type Sender struct {
-	ApiKey string
-	ApiUrl string
+	ApplicationKey string
+	ServerHandler  string
+	ApiUrl         string
 }
 
 type SendEntries struct {
-	ApiKey  string
-	Entries []storage.OutputEntry
+	ApplicationKey string
+	ServerHandler  string
+	Entries        []storage.OutputEntry
 }
 
-func (self Sender) SendEntries(entries []storage.OutputEntry) {
+type ResponseData struct {
+	Status string `json:'status'`
+}
+
+func (self Sender) SendEntries(entries []storage.OutputEntry) bool {
 	sendEntriesData := SendEntries{
-		ApiKey:  self.ApiKey,
-		Entries: entries,
+		ApplicationKey: self.ApplicationKey,
+		ServerHandler:  self.ServerHandler,
+		Entries:        entries,
 	}
 	// entriesJSON, _ := json.Marshal(entries)
 	sendEntriesDataJSON, _ := json.Marshal(sendEntriesData)
@@ -32,7 +39,7 @@ func (self Sender) SendEntries(entries []storage.OutputEntry) {
 		logger.Logger.Log(
 			fmt.Sprintf("Error while sending request", err),
 		)
-		return
+		return false
 	}
 	req.Header.Set("Content-Type", "application/json")
 
@@ -43,10 +50,24 @@ func (self Sender) SendEntries(entries []storage.OutputEntry) {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("request Body:", sendEntriesData)
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Headers:", resp.Header)
+	// fmt.Println("request Body:", sendEntriesData)
+	// fmt.Println("response Status:", resp.Status)
+	// fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println("response Body:", string(body))
+
+	responseData := ResponseData{}
+	err = json.Unmarshal(body, &responseData)
+	if err != nil {
+		panic(err)
+	}
+	// fmt.Println("response Body:", string(body))
+	// fmt.Println("response Body:", responseData)
+	fmt.Println("response Body:", responseData.Status)
+
+	if responseData.Status == "OK" {
+		return true
+	}
+
+	return false
 
 }
