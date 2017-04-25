@@ -22,9 +22,8 @@ import (
 //
 // This function should contain ALL channel variables
 func main() {
-
 	// General application defaults
-	configurationFile := "configuration_small.json"
+	configurationFile := "configuration.json"
 
 	// Configuration
 	configuration := startup.GetConfiguration(configurationFile)

@@ -13,9 +13,10 @@ is a valid shell command that produces a single number.
 
 ## Current status
 
-Currently, there is no functionality to send that data. A sender is being
-prepared and will work once I have the possibility to work on the server,
-listening for those API calls.
+The server seer client supports sending data but as of now, there is no official
+SaaS to parse and visualize that data. The expected Beta launch is expected on June.
+Of course, a custom solution, not dependant on the SaaS being built can be implemented
+using the simple API of a single POST call.
 
 ~~Also, a shell UI is being worked on, based on [gizak/termui](https://github.com/gizak/termui).~~
 Scrapped for now because of lacking functionality.
@@ -26,6 +27,16 @@ should suffice the basic needs.
 ## Using
 
 ### Install
+
+#### Using the built version
+
+Check, if the built version exists in the `build` folder. Grab the correct one for
+your architecture.
+
+You will need the `configuration.json` and `commands.json` files in the same directory for the application
+to start. The sqlite database should be created automatically.
+
+#### Building it yourself
 
 To use the application, you will need to build it. To build it you just need
 to [install Go](https://golang.org/doc/install). Once you have Go, just run 
@@ -101,6 +112,8 @@ This file defines the whole functionality.
 * _sendData_ - whether the sender should be used.
 * _senderOptions_ - if sender is enabled, settings will be used for the API
     * _url_ - URL for the API
+    * _application_key_ - the key for the application that is being monitored
+    * _server_handler_ - the server that is being monitored, for the application
     * _entriesPerCycle_ - how many entries will be checked on each cycle 
     * _cycleFrequency_ - how often entries will be parsed, and attempted to be sent
 
@@ -130,3 +143,27 @@ _timeframe_ - "1" for 1min average; "2" for 5min avg; "3" for 15min avg.
 Remaining memory in bytes.
 
 ````free | grep 'Mem' | tr -s ' ' '\n' | tail -n +2 | sed -n '3p'````
+
+
+## API
+
+For sending the data the server seer client uses a single endpoint.
+
+### POST SendEntries
+
+````
+{
+    "ApplicationKey": "application key",
+    "ServerHandler": "this server's identifier",
+    "Entries": [
+        {
+            "id": 1,
+            "handlerIdentifier": "command being run (ex. load_1min)",
+            "output": "value measured",
+            "timestamp": "unix of when it was measured"
+        },
+        ...
+    ]
+    
+}
+````

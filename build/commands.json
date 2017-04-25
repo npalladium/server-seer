@@ -1,0 +1,13 @@
+[{
+    "name": "disk_space_used_percentage",
+    "command": "df | grep '<filesystem>' | tr -s ' ' | tr ' ' '\n' | tail -2 | head -1 | tr -d '%'"
+}, {
+    "name": "system_load",
+    "command": "uptime | tr ' ' '\n' | tr -d ',' | tail -3 | sed -n '<timeframe>p'"
+}, {
+    "name": "memory_usage_remaining",
+    "command": "free | grep 'Mem' | tr -s ' ' '\n' | tail -n +2 | sed -n '3p'"
+}, {
+    "name": "swap_usage_remaining",
+    "command": "free | grep 'Mem' | tr -s ' ' '\n' | tail -n +2 | sed -n '3p'"
+}]
