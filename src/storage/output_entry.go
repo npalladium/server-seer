@@ -137,3 +137,14 @@ func (self OutputEntry) Store() error {
 
 	return nil
 }
+
+func DeleteOldEntries(oldestEntrySeconds int) error {
+	timestampOldest := time.Now().Unix() - int64(oldestEntrySeconds)
+	str := fmt.Sprintf("DELETE FROM entries WHERE timestamp < %d", timestampOldest)
+
+	_, err := DBConn.Exec(
+		str,
+	)
+
+	return err
+}

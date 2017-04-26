@@ -23,7 +23,7 @@ import (
 // This function should contain ALL channel variables
 func main() {
 	// General application defaults
-	configurationFile := "configuration.json"
+	configurationFile := "configuration_example.json"
 
 	// Configuration
 	configuration := startup.GetConfiguration(configurationFile)
@@ -62,6 +62,8 @@ func main() {
 	startStorageListener(outputEntryChannel)
 
 	startEntrySender(configuration)
+
+	startEntryCleanup(configuration)
 
 	// Exit the main thread. Application keeps on running.
 	runtime.Goexit()
@@ -155,4 +157,41 @@ func startEntrySender(configuration src.Configuration) {
 			<-ticker.C
 		}
 	}(configuration, dataSender)
+}
+
+// Starts entry cleanup. This targets old entries and removes them from the db
+func startEntryCleanup(configuration src.Configuration) {
+	logger.Logger.Log(". Starting entry cleanup")
+
+	go func(configuration src.Configuration) {
+
+		cleanupFrequency := 120
+		cleanupOldestEntry := 259200
+
+		if configuration.CleanupFrequency != 0 {
+			cleanupFrequency = configuration.CleanupFrequency
+		}
+		if configuration.CleanupOldestEntry != 0 {
+			cleanupOldestEntry = configuration.CleanupOldestEntry
+		}
+
+		ticker := time.NewTicker(
+			time.Duration(cleanupFrequency) * time.Second,
+		)
+
+		for {
+
+			// Deletes entries older than the defined oldest entry
+			err := storage.DeleteOldEntries(cleanupOldestEntry)
+
+			if err != nil {
+				src.ExitApplicationWithMessage(
+					fmt.Sprintf("Error getting unsent entries: %s", err),
+				)
+			}
+
+			<-ticker.C
+		}
+	}(configuration)
+
 }

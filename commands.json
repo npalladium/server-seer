@@ -1,6 +1,6 @@
 [{
     "name": "disk_space_used_percentage",
-    "command": "df | grep '<filesystem>' | tr -s ' ' | tr ' ' '\n' | tail -2 | head -1 | tr -d '%'"
+    "command": "df | grep '<filesystem>'"
 }, {
     "name": "system_load",
     "command": "uptime | tr ' ' '\n' | tr -d ',' | tail -3 | sed -n '<timeframe>p'"

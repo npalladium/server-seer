@@ -33,5 +33,7 @@
         "serverHandler": "s1",
         "entriesPerCycle": 50,
         "cycleFrequency": 30
-    }
+    },
+    "cleanupFrequency": 60,
+    "cleanupOldestEntry": 259200
 }

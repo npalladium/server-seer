@@ -8,6 +8,9 @@ type Configuration struct {
 	SendData       bool
 	SenderSettings SenderSettings
 	RuntimeData    RuntimeData
+
+	CleanupFrequency   int
+	CleanupOldestEntry int
 }
 
 type SenderSettings struct {

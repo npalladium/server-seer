@@ -93,9 +93,13 @@ This file defines the whole functionality.
     "sendData": true,
     "senderSettings": {
         "url": "http://www.mocky.io/v2/5185415ba171ea3a00704eed",
+        "application_key": "abcdefg",
+        "server_handler": "s1",
         "entriesPerCycle":10,
         "cycleFrequency":30
-    }
+    },
+    "cleanupFrequency": 120,
+    "cleanupOldestEntry": 259200
 }
 ````
 
@@ -116,6 +120,8 @@ This file defines the whole functionality.
     * _server_handler_ - the server that is being monitored, for the application
     * _entriesPerCycle_ - how many entries will be checked on each cycle 
     * _cycleFrequency_ - how often entries will be parsed, and attempted to be sent
+* _cleanupFrequency_ - how often a cleanup is ran, seconds
+* _cleanupOldestEntry_ - oldest entry to keep in the database during cleanup, seconds
 
 ## Known and tested commands
 
