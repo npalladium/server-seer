@@ -30,11 +30,13 @@ should suffice the basic needs.
 
 #### Using the built version
 
-Check, if the built version exists in the `build` folder. Grab the correct one for
-your architecture.
+Download the latest release file from here: https://github.com/andriussev/server-seer/releases
+or one from the `build` folder. Be sure to download the one with your architecture.
 
-You will need the `configuration.json` and `commands.json` files in the same directory for the application
-to start. The sqlite database should be created automatically.
+You will need the `configuration.json` and `commands.json`, for which you can find examples
+in the repository.
+
+The sqlite database should be created automatically.
 
 #### Building it yourself
 
