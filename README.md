@@ -92,7 +92,7 @@ This file defines the whole functionality.
     }],
     "sendData": true,
     "senderSettings": {
-        "url": "http://www.mocky.io/v2/5185415ba171ea3a00704eed",
+        "url": "defined-url",
         "application_key": "abcdefg",
         "server_handler": "s1",
         "entriesPerCycle":10,
