@@ -125,31 +125,7 @@ This file defines the whole functionality.
 
 ## Known and tested commands
 
-I will try to keep and update a list of commands that can be used out-of-the-box
-for people who do not want to fiddle with bash too much.
-
-### Disk space percentage
-
-Returns the percentage of how much disk space is left.
-
-````df | grep '<filesystem>' | tr -s ' ' | tr ' ' '\n' | tail -2 | head -1 | tr -d '%'````
-
-_filesystem_ - filesystem name
-
-### System load
-
-CPU load for a specific timeframe.
-
-````uptime | tr ' ' '\n' | tr -d ',' | tail -3 | sed -n '<timeframe>p'````
-
-_timeframe_ - "1" for 1min average; "2" for 5min avg; "3" for 15min avg.
-
-### Remaining memory
-
-Remaining memory in bytes.
-
-````free | grep 'Mem' | tr -s ' ' '\n' | tail -n +2 | sed -n '3p'````
-
+Read the Wiki page - https://github.com/andriussev/server-seer/wiki/Commands#known-and-tested-commands
 
 ## API
 
