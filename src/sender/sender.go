@@ -50,19 +50,19 @@ func (self Sender) SendEntries(entries []storage.OutputEntry) bool {
 	}
 	defer resp.Body.Close()
 
-	// fmt.Println("request Body:", sendEntriesData)
-	// fmt.Println("response Status:", resp.Status)
-	// fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 
 	responseData := ResponseData{}
 	err = json.Unmarshal(body, &responseData)
 	if err != nil {
-		panic(err)
+		logger.Logger.Log(
+			fmt.Sprintf("Response from consuming server failed to be parsed: %s", err),
+		)
 	}
-	// fmt.Println("response Body:", string(body))
-	// fmt.Println("response Body:", responseData)
-	fmt.Println("response Body:", responseData.Status)
+
+	logger.Logger.Log(
+		fmt.Sprintf("Response from consuming server received: %s", string(body)),
+	)
 
 	if responseData.Status == "OK" {
 		return true
