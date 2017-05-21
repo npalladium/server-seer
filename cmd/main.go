@@ -92,11 +92,11 @@ func startStorageListener(outputEntryChannel chan storage.OutputEntry) {
 	go func(outputEntryChannel chan storage.OutputEntry) {
 		var err error
 		var outputEntries []storage.OutputEntry
-		storeAmount := 10
+		storeAmount := 1
 		for {
 			outputEntry := <-outputEntryChannel
 			outputEntries = append(outputEntries, outputEntry)
-			if len(outputEntries) == storeAmount {
+			if len(outputEntries) >= storeAmount {
 				err = storage.StoreOutputEntries(outputEntries)
 
 				if err != nil {
