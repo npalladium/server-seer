@@ -46,7 +46,9 @@ func (self Sender) SendEntries(entries []storage.OutputEntry) bool {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		logger.Logger.Log(
+			fmt.Sprintf("Failed to do a request: %s", err),
+		)
 	}
 	defer resp.Body.Close()
 
