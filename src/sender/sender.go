@@ -49,6 +49,7 @@ func (self Sender) SendEntries(entries []storage.OutputEntry) bool {
 		logger.Logger.Log(
 			fmt.Sprintf("Failed to do a request: %s", err),
 		)
+		return false
 	}
 	defer resp.Body.Close()
 
